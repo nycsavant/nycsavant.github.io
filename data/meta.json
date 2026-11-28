@@ -1,1 +1,1 @@
-{"generated":"2026-11-27T13:00","dates":["2026-11-26"],"simulated":false,"buses":2113,"definitions":{"on_sched":{"subway":[1000000,300],"bus":[60,300]},"replacement_pctl":0.2,"min_trips":20}}
+{"generated":"2026-11-28T05:32","dates":["2026-11-26","2026-11-27"],"simulated":false,"buses":3984,"definitions":{"on_sched":{"subway":[1000000,300],"bus":[60,300]},"replacement_pctl":0.2,"min_trips":20}}
