@@ -37,7 +37,11 @@ S.pages.delays = async (root) => {
   const x = d3.scaleLinear([0, nb], [m.l, W - m.r]);
   const svg = d3.select(el).append("svg").attr("width", W).attr("height", H);
   const ent = (dw.entries || []).flatMap((d) => (d || new Array(24).fill(null)));
-  if (ent.length) {
+  const hasEnt = ent.some((v) => v != null);
+  if (!hasEnt) {
+    svg.append("text").attr("x", m.l + 8).attr("y", m.t + AH / 2).attr("class", "note").attr("fill", "var(--ink-3)")
+      .text("Station entries for these days aren't published yet (NY Open Data runs a few days to weeks behind).");
+  } else {
     const ya = d3.scaleLinear([0, d3.max(ent) || 1], [m.t + AH, m.t]).nice();
     svg.append("g").attr("class", "axis").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(ya).ticks(3).tickFormat(d3.format("~s")));
     svg.append("path").datum(ent).attr("fill", "var(--ink-3)").attr("fill-opacity", 0.3)
@@ -47,7 +51,7 @@ S.pages.delays = async (root) => {
   const cw = (W - m.l - m.r) / nb;
   rowsData.forEach((row, ri) => {
     const g = svg.append("g").attr("transform", `translate(0,${top + ri * RH})`);
-    g.append("foreignObject").attr("x", m.l - 24).attr("y", -1).attr("width", 20).attr("height", 19).html(S.bullet(row.r, "sm"));
+    S.svgBullet(g, row.r, m.l - 14, (RH - 3) / 2, 15);
     // canvas-like: merge runs of equal color to keep the DOM light
     let i = 0;
     while (i < nb) {
@@ -71,7 +75,7 @@ S.pages.delays = async (root) => {
       const di = Math.floor(bin / 144), sec = (bin % 144) * 600, hb = di * 24 + Math.floor(sec / 3600);
       const ri = Math.floor((py - top) / RH);
       let html = `<b>${S.fmt.date(days[di])}, ${S.fmt.clock(sec)}</b>`;
-      if (ent.length && ent[hb] != null) html += `<br>${S.fmt.num(ent[hb])} entries that hour`;
+      if (hasEnt && ent[hb] != null) html += `<br>${S.fmt.num(ent[hb])} entries that hour`;
       if (ri >= 0 && ri < rowsData.length) {
         const v = rowsData[ri].v[bin];
         html += `<br>${S.bullet(rowsData[ri].r, "sm")} ${v == null ? "no trains" : `${S.fmt.signed(v, 0)}% vs. normal`}`;

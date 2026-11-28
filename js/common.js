@@ -38,6 +38,24 @@ S.bullet = (r, size = "") => {
   const fs = r === "SI" ? "font-size:9px;" : "";
   return `<span class="bullet ${size}${diamond}" title="${r}" style="background:${L.color};color:${L.text};${fs}"><span>${txt}</span></span>`;
 };
+// the same bullet drawn in SVG, for labels inside charts (HTML in a foreignObject
+// gets clipped, and Safari misplaces rotated diamonds there)
+S.svgBullet = (sel, r, cx, cy, d = 16) => {
+  const L = S.lineInfo[r] || { color: "#808183", text: "#fff" };
+  const g = sel.append("g").attr("transform", `translate(${cx},${cy})`);
+  g.append("title").text(r);
+  if (/X$/.test(r)) {
+    const s = d / Math.SQRT2;
+    g.append("rect").attr("x", -s / 2).attr("y", -s / 2).attr("width", s).attr("height", s).attr("rx", 2)
+      .attr("transform", "rotate(45)").attr("fill", L.color);
+  } else {
+    g.append("circle").attr("r", d / 2).attr("fill", L.color);
+  }
+  g.append("text").attr("text-anchor", "middle").attr("dy", "0.36em").style("fill", L.text)
+    .attr("font-size", r === "SI" ? d * 0.42 : d * 0.62).attr("font-weight", 700)
+    .text(r === "SI" ? "SIR" : S.label(r));
+  return g;
+};
 S.busRoute = (r) => `<span class="busroute${r.includes("+") ? " sbs" : ""}">${r.replace("+", " SBS")}</span>`;
 S.sortRoutes = (rs) => rs.slice().sort((a, b) => {
   const ia = S.routeOrder.indexOf(a), ib = S.routeOrder.indexOf(b);
